@@ -1,0 +1,137 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r set up,include=FALSE,warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(Seurat)
+library(tidyverse)
+library(reticulate)
+library(patchwork)
+# reticulate::py_install(packages = 'umap-learn')
+```
+
+* Initialize workspace
+
+```{r import data}
+# input data
+pbmc.data <- Read10X(data.dir="C:/Users/hanwe/Desktop/single cell sequencing-pig/data/P1_filtered_feature_bc_matrix/")
+
+# Genes that are expressed in at least 3 single cells are preserved
+# Cells that contain at least 200 genes are preserved
+pbmc <- CreateSeuratObject(counts=pbmc.data, project="M1M3",min.cells=3,min.features=200) 
+pbmc
+
+# calculate the proportion of transcripts mapping to mitochondrial genes
+pbmc[["percent.mt"]] <- PercentageFeatureSet(pbmc,pattern="^MT")
+```
+
+
+* QC plot 
+
+```{r QC plot1}
+# pdf(file="QC_plot.pdf",width=18,height=9)
+VlnPlot(pbmc,features=c("nFeature_RNA","nCount_RNA","percent.mt"),ncol=3)
+plot1 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "percent.mt")
+plot2 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot1
+plot2
+# Use "+" from patchwork to replace CombinePlots function from Seurat
+# plot1 + plot2
+# dev.off()
+```
+
+
+
+```{r clean data}
+pbmc <- subset(pbmc, subset = nFeature_RNA > 200 & nFeature_RNA < 3000 & percent.mt < 1.5)
+pbmc <- NormalizeData(pbmc, normalization.method = "LogNormalize", scale.factor = 10000)
+pbmc <- FindVariableFeatures(pbmc, selection.method = "vst", nfeatures = 2000)
+# pbmc <- FindVariableFeatures(pbmc, selection.method = "mean.var.plot")
+# pbmc <- FindVariableFeatures(pbmc, selection.method = "vst",mean.cutoff = c(0.0125, 0.3),dispersion.cutoff = c(0.5, Inf))
+top10 <- head(VariableFeatures(pbmc), 10)
+plot1 <- VariableFeaturePlot(pbmc)
+plot2 <- LabelPoints(plot=plot1,points=top10)
+plot1
+plot2
+```
+VariableFeatures
+* Apply PCA to pbmc
+* Run t-SNE dimensionality reduction on selected features
+* Use KNN to do clustering
+
+```{r PCA}
+# pdf(file="pca_heatmap.pdf")
+all.genes <- rownames(pbmc)
+pbmc <- ScaleData(pbmc, features = all.genes)
+pbmc <- RunPCA(pbmc, features = VariableFeatures(object = pbmc))
+#VizDimLoadings(pbmc,dims=1:5,reduction="pca")
+DimPlot(pbmc,reduction="pca")
+DimHeatmap(pbmc, dims = 1:15, cells = 500, balanced = TRUE)
+ElbowPlot(pbmc)
+
+# Use 15 PCs to run TSNE
+pbmc <- RunUMAP(pbmc,dims = 1:10)
+# Use KNN to run do clustering
+pbmc <- FindNeighbors(pbmc, dims = 1:10,k.param = 30,n.trees = 100)
+pbmc <- FindClusters(pbmc, resolution = 0.38,n.iter = 10000,start = 100)
+```
+
+
+```{r tnse plot}
+# TSNE plot
+DimPlot(pbmc,reduction = 'umap',label = TRUE)
+
+```
+
+
+* Dotplot
+
+```{r dotplot}
+# Dotplot
+Idents.name <- c("PT-S1","PT-S2","PT-S3",
+                 "LOH","TAL","DT&CD",
+                 "Endo","SMC","MC","Podo",
+                 "Fib",'temp1',"temp2")
+names(Idents.name) <- as.character(0:12)
+pbmc <- RenameIdents(pbmc,Idents.name)
+
+Idents(pbmc) <- factor(Idents(pbmc),levels = rev(c("PT-S1","PT-S2","PT-S3",
+                                               "LOH","TAL","DT&CD",
+                                               "Endo","SMC","MC","Podo",
+                                               "Fib","temp1","temp2")))
+markers.to.plot <- c("Slc5a2","Slc27a2","Slc5a12","Fxyd2","Hrsp12","Atp11a","Slc13a3",
+                     "Aqp1","Bst1","Umod","Slc12a1","Slc5a1",
+                     "Slc12a3","Aqp2","Flt1","Kdr","Acta2",
+                     "Tagln","Dcn",
+                     "Nphs1","Nphs2","S100a4","Cd14","C1qa")
+markers.to.plot <- toupper(markers.to.plot)
+
+DotPlot(pbmc, features = markers.to.plot, cols = c("lightblue","blue")) +
+  RotatedAxis()
+```
+
+* Vlnplot
+
+```{r Vlnplot1}
+# Vlnplot
+# Reverse Identity class back to the original status
+Idents.name <- as.character(0:12)
+names(Idents.name) <- c("PT-S1","PT-S2","PT-S3",
+                        "LOH","TAL","DT&CD",
+                        "Endo","SMC","MC","Podo",
+                        "Fib","temp1","temp2")
+pbmc <- RenameIdents(pbmc,Idents.name)
+pbmc[['active.ident']] <- Idents(pbmc)
+# Idents(pbmc) <- factor(Idents(pbmc),levels = c(1:12))
+VlnPlot(pbmc, features = markers.to.plot,stack = T,flip = T,
+                 pt.size = 0, combine = F,
+        fill.by = "ident") + 
+  theme(legend.position = "none",
+        axis.text.y = element_blank(),
+        axis.title.y = element_blank(),axis.title.x = element_blank())+
+  ylab(markers.to.plot)+ggtitle("")
+
+```

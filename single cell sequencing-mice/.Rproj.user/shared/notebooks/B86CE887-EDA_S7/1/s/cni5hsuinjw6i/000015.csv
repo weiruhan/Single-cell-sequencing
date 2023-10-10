@@ -1,0 +1,94 @@
+"0","# pdf(file=""pca_heatmap.pdf"")
+all.genes <- rownames(pbmc)
+pbmc <- ScaleData(pbmc, features = all.genes)
+"
+"2","Centering and scaling data matrix
+"
+"2","  |                                                                                                                          "
+"2","  |                                                                                                                    |   0%"
+"2","  |                                                                                                                          "
+"2","  |=====                                                                                                               |   5%"
+"2","  |                                                                                                                          "
+"2","  |===========                                                                                                         |   9%"
+"2","  |                                                                                                                          "
+"2","  |================                                                                                                    |  14%"
+"2","  |                                                                                                                          "
+"2","  |=====================                                                                                               |  18%"
+"2","  |                                                                                                                          "
+"2","  |==========================                                                                                          |  23%"
+"2","  |                                                                                                                          "
+"2","  |================================                                                                                    |  27%"
+"2","  |                                                                                                                          "
+"2","  |=====================================                                                                               |  32%"
+"2","  |                                                                                                                          "
+"2","  |==========================================                                                                          |  36%"
+"2","  |                                                                                                                          "
+"2","  |===============================================                                                                     |  41%"
+"2","  |                                                                                                                          "
+"2","  |=====================================================                                                               |  45%"
+"2","  |                                                                                                                          "
+"2","  |==========================================================                                                          |  50%"
+"2","  |                                                                                                                          "
+"2","  |===============================================================                                                     |  55%"
+"2","  |                                                                                                                          "
+"2","  |=====================================================================                                               |  59%"
+"2","  |                                                                                                                          "
+"2","  |==========================================================================                                          |  64%"
+"2","  |                                                                                                                          "
+"2","  |===============================================================================                                     |  68%"
+"2","  |                                                                                                                          "
+"2","  |====================================================================================                                |  73%"
+"2","  |                                                                                                                          "
+"2","  |==========================================================================================                          |  77%"
+"2","  |                                                                                                                          "
+"2","  |===============================================================================================                     |  82%"
+"2","  |                                                                                                                          "
+"2","  |====================================================================================================                |  86%"
+"2","  |                                                                                                                          "
+"2","  |=========================================================================================================           |  91%"
+"2","  |                                                                                                                          "
+"2","  |===============================================================================================================     |  95%"
+"2","  |                                                                                                                          "
+"2","  |====================================================================================================================| 100%"
+"2","
+"
+"0","pbmc <- RunPCA(pbmc, features = VariableFeatures(object = pbmc))"
+"2","PC_ 1 
+Positive:  Emcn, Plvap, Ly6c1, Adgrl4, Plpp1, Sparc, Egfl7, Timp3, Tm4sf1, Meis2 
+	   Wfdc17, Flt1, Ly6a, Fabp4, C1qa, Ptprb, C1qb, Esam, Adgrf5, Plpp3 
+	   Cdh5, Eng, Gimap6, Kdr, Pecam1, Ramp2, Apoe, Slc9a3r2, Cavin3, Podxl 
+Negative:  Trps1, Thbs1, Nfkb1, Alcam, Antxr2, Zeb2, Cytip, Fn1, Cd14, Malt1 
+	   Pid1, Etv6, Rel, Csf2rb, Nlrp3, Mxi1, Map4k4, Slc7a11, Gpr132, Dock10 
+	   Uck2, Cd86, Xylt1, Cdkn1a, F10, Eno1, Crtc3, Clec4e, Ifrd1, S100a11 
+PC_ 2 
+Positive:  Flt1, Adgrl4, Plvap, Meis2, Timp3, Emcn, Plpp3, Adgrf5, Cdh5, Esam 
+	   Plpp1, Ptprb, Egfl7, Tm4sf1, Col4a1, Eng, Col4a2, Gimap6, Sparc, Ptprg 
+	   Fabp4, Ly6c1, Kdr, Podxl, Cd34, Ptprm, Pecam1, Cyyr1, Ldb2, Tcim 
+Negative:  Ftl1, Apoe, Wfdc17, Ctsd, Spp1, Ccl6, Pf4, C1qb, C1qa, Ctsb 
+	   C1qc, Cd63, Lyve1, Lgals1, Ccl7, Fabp5, Ccl2, Timp2, Ms4a7, Mt1 
+	   Selenop, Hmox1, Arg1, Maf, Syngr1, Npl, Ltc4s, Mrc1, Plin2, Gpnmb 
+PC_ 3 
+Positive:  H2-Eb1, Cd74, H2-Ab1, H2-Aa, Tnip3, H2-DMb2, Tmem176b, Tmem176a, Ccl17, Mgl2 
+	   Cd72, Klrd1, Ccnd2, Klrb1b, H2-Oa, Ckb, Cd209a, Stat4, P2ry10, H2-DMb1 
+	   Cxcl16, Rnf180, Ust, C1qa, Tbc1d4, Cst3, Traf1, Flt3, Plscr1, Slamf9 
+Negative:  Thbs1, Fn1, Chil3, F10, Arg1, Rgcc, Ctsl, Spp1, Ccl6, Plcb1 
+	   Vegfa, Pgk1, Ftl1, Mif, Ccl24, Pkm, Pgam1, Ier3, Pdpn, Ccl9 
+	   Vcan, Mmp19, Adssl1, Tpi1, Ldha, Eno1, Aldoa, Gapdh, Cstb, Lgals3 
+PC_ 4 
+Positive:  Il1r2, S100a9, Hdc, S100a8, G0s2, Lcn2, Hp, Gsr, Csf3r, Pglyrp1 
+	   Mirt1, Retnlg, Cxcr2, Il1b, Acod1, Mxd1, Mmp9, Antxr2, Wfdc21, Chil3 
+	   S100a11, Resf1, Stfa2l1, Sgms2, Slfn1, Txnip, Ptgs2os2, Samsn1, Mcemp1, Lamb3 
+Negative:  Apoe, Mafb, Fnip2, Dab2, Sash1, Mrc1, Ctss, Ctsb, Psap, Ifi207 
+	   C1qc, Rgl1, Ehd4, C1qb, Camk2d, Epb41l2, Snx8, Nceh1, Maf, Mertk 
+	   Psd3, C1qa, Osbpl8, Slc9a9, Dennd1a, Cd68, Arhgap10, Klf4, Blnk, Stab1 
+PC_ 5 
+Positive:  Crip1, Tmsb10, S100a4, Ccl17, H2-Aa, H2-DMb2, H2-Eb1, H2-Ab1, Anxa2, Klrd1 
+	   Vim, Napsa, P2ry10, Cd74, H2-Oa, Capg, S100a6, Gapdh, Ccr7, Klrb1b 
+	   Lgals3, Eno1, Cd209a, Grasp, Ifi30, Tbc1d4, Ccl22, Dpp4, Spp1, Zbtb46 
+Negative:  S100a9, Hdc, G0s2, Csf3r, Mxd1, S100a8, Pglyrp1, Retnlg, Cxcr2, Pik3ap1 
+	   Acod1, Apoe, Mirt1, Resf1, Mmp9, Marcksl1, Nfkbiz, Dennd4a, Entpd1, Icam1 
+	   Txnip, Il1r2, Tnfaip2, Btg2, Ankrd33b, C1qa, Neat1, Tnf, Mrc1, Stfa2l1 
+"
+"0","#VizDimLoadings(pbmc,dims=1:5,reduction=""pca"")"
+"0","pdf(file=""mice_S7_plot/pc_plot.pdf"",width=18,height=9)"
+"0","DimPlot(pbmc,reduction=""pca"")"

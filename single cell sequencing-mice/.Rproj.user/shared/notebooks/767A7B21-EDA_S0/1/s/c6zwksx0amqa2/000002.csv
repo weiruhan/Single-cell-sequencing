@@ -1,0 +1,16 @@
+"0","```r
+# pdf(file=\"pca_heatmap.pdf\")
+all.genes <- rownames(pbmc)
+pbmc <- ScaleData(pbmc, features = all.genes)
+pbmc <- RunPCA(pbmc, features = VariableFeatures(object = pbmc))
+#VizDimLoadings(pbmc,dims=1:5,reduction=\"pca\")
+DimPlot(pbmc,reduction=\"pca\")
+DimHeatmap(pbmc, dims = 1:15, cells = 500, balanced = TRUE)
+ElbowPlot(pbmc)
+
+# Use 10 PCs to run UMAP
+pbmc <- RunUMAP(pbmc,dims = 1:10)
+# Use KNN to run do clustering
+pbmc <- FindNeighbors(pbmc, dims = 1:10,k.param = 30,n.trees = 100)
+pbmc <- FindClusters(pbmc, resolution = 0.38,n.iter = 10000,start = 100)
+```"

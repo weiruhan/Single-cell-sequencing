@@ -1,0 +1,10 @@
+"0","pdf(file=""mice_S14_plot/cluster_plot.pdf"",width=18,height=9)
+DimPlot(pbmc,reduction = 'umap',label = TRUE)
+dev.off()
+"
+"1","RStudioGD "
+"1","
+"
+"1","        2 "
+"1","
+"

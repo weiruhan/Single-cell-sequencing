@@ -1,0 +1,89 @@
+"0","```r
+# pdf(file=\"pca_heatmap.pdf\")
+all.genes <- rownames(pbmc)
+pbmc <- ScaleData(pbmc, features = all.genes)
+```"
+"1","Centering and scaling data matrix
+
+  |                                                                                                        
+  |                                                                                                  |   0%
+  |                                                                                                        
+  |=====                                                                                             |   6%
+  |                                                                                                        
+  |===========                                                                                       |  11%
+  |                                                                                                        
+  |================                                                                                  |  17%
+  |                                                                                                        
+  |======================                                                                            |  22%
+  |                                                                                                        
+  |===========================                                                                       |  28%
+  |                                                                                                        
+  |=================================                                                                 |  33%
+  |                                                                                                        
+  |======================================                                                            |  39%
+  |                                                                                                        
+  |============================================                                                      |  44%
+  |                                                                                                        
+  |=================================================                                                 |  50%
+  |                                                                                                        
+  |======================================================                                            |  56%
+  |                                                                                                        
+  |============================================================                                      |  61%
+  |                                                                                                        
+  |=================================================================                                 |  67%
+  |                                                                                                        
+  |=======================================================================                           |  72%
+  |                                                                                                        
+  |============================================================================                      |  78%
+  |                                                                                                        
+  |==================================================================================                |  83%
+  |                                                                                                        
+  |=======================================================================================           |  89%
+  |                                                                                                        
+  |=============================================================================================     |  94%
+  |                                                                                                        
+  |==================================================================================================| 100%
+"
+"0","```r
+pbmc <- RunPCA(pbmc, features = VariableFeatures(object = pbmc))
+```"
+"1","PC_ 1 
+Positive:  PTPRC, LCP1, RUNX1, CD53, ENSSSCG00000001229, LAPTM5, BTG1, STK17B, ENSSSCG00000001341, ARHGAP15 
+	   CD99, CYTH1, ENSSSCG00000016758, TMSB10, INPP5D, APBB1IP, ENSSSCG00000033909, ELF1, ARHGDIB, ENSSSCG00000011121 
+	   DOCK10, TNFAIP3, CXCR4, ETS1, SRGN, TNFRSF1B, RGS1, MSN, RAC2, RIPOR2 
+Negative:  HAO2, GPX3, ENSSSCG00000030300, G6PC, PCK1, CYP4A24, MT1A, PDK4, SLC16A9, SLC16A12 
+	   SLC13A1, EPB41L3, ENSSSCG00000012202, ENSSSCG00000009500, MAP7, NOX4, ENSSSCG00000035347, CUBN, CLIC4, ENSSSCG00000009347 
+	   TPM1, NR1H4, ENSSSCG00000018061, IGFBP7, ENSSSCG00000022738, MSRA, ENSSSCG00000010212, CDKL1, GPAT3, TP53INP1 
+PC_ 2 
+Positive:  ENSSSCG00000030300, LDHB.1, GPX3, MT1A, B2M, TMSB4X, RAC2, CCL5, CD2, ARHGDIB 
+	   GZMB, CD3G, GNLY, ENSSSCG00000033721, CXCR4, GZMA.1, CST7, PPP1R1A, CTSW, ENSSSCG00000037885 
+	   PTPRC, CD3E, ENSSSCG00000029596, CD52, STAT4, IL12RB2, SLA2, NKG7, CORO1A, STK17B 
+Negative:  PRKN, ENSSSCG00000023479, ENSSSCG00000030560, ENSSSCG00000006344, GPHN, BNC2, ATRNL1, ENSSSCG00000036148, PTPRM, SETBP1 
+	   GRAMD1B, SNX29, LPP, LRMDA, DST, CCDC173, ENSSSCG00000035984, PTPRK, IDO2, EXOC4 
+	   DENND5B, EXT1, PPP2R3A, WWC1, SBF2, TRIO, AGAP1, OXR1, ZBTB20, LIMCH1 
+PC_ 3 
+Positive:  PDE3B, RORA, CD2, ITK, CTSW, SKAP1, IL12RB2, STAT4, ENSSSCG00000033721, CD3G 
+	   CCL5, SLA2, GZMB, ARAP2, GZMA.1, CST7, CD3E, BTBD11, GNLY, TOX 
+	   CD3D, KLRK1, ATP8A1, CRTAM, ENSSSCG00000037885, PRF1, LAX1, CXCR4, TNIK, ENSSSCG00000014909 
+Negative:  RAMP2, GNG11, LDB2, PECAM1, ICAM1, CLEC3B, ADGRL4, PTPRB, CFD, FLT1 
+	   PREX2, CXCL2, FAM167B, RBMS3, ENSSSCG00000032436, EMCN, RHOJ, MARCKS, ENG, CALCRL 
+	   TCF4, DNASE1L3, TM4SF1, PALM2, MEF2C, CLEC14A, HLA-DRA, TEK, AKAP12, ESAM 
+PC_ 4 
+Positive:  LDB2, PTPRB, CLEC3B, ADGRL4, PECAM1, FLT1, PREX2, RBMS3, EMCN, FAM167B 
+	   RHOJ, ENSSSCG00000032436, CLIC5, PRKCH, CLEC14A, TM4SF1, PLVAP, ENSSSCG00000016548, ENG, AKAP12 
+	   PALM2, ENSSSCG00000021656, MEIS2, ESAM, CALCRL, ITM2A, GALNT18, ENSSSCG00000001725, DOCK9, S1PR1 
+Negative:  C5AR1, ENSSSCG00000033457, PLAUR, TGM3, TREM1, ENSSSCG00000032135, ENSSSCG00000016184, FOLR1, ALOX5AP, PHACTR1 
+	   ENSSSCG00000032594, ENSSSCG00000036865, CXCL8, ENSSSCG00000037426, CSF3R, CSF2RB, SPI1, TYROBP, PLEKHM3, G0S2 
+	   MARCKS, ENSSSCG00000014891, ADAM19, NOTCH2, ANTXR2, SLC11A1, GPR84, ENSSSCG00000029414, ENSSSCG00000039758, ENSSSCG00000003236 
+PC_ 5 
+Positive:  ENSSSCG00000016184, TREM1, ENSSSCG00000036865, ENSSSCG00000032594, SORL1, ENSSSCG00000037735, PLEKHM3, TGM3, ADAM19, TMEM154 
+	   ENSSSCG00000039758, CSF3R, ENSSSCG00000031023, IPMK, ERG, VPS37B, ITGA2, MXD1, MCTP1, CXCL8 
+	   C5AR1, NOTCH2, CRISPLD2, SELL, XPO6, SVIL, SAMSN1, PPARD, MYO9B, HERC5 
+Negative:  C1QB, C1QC, C1QA, CSF1R, CD83, ARHGAP22, CD86, ENSSSCG00000001456, C3, MARCH1 
+	   MS4A7, SLA-DQB1, HLA-DRA, PKIB, ENSSSCG00000001455, ENSSSCG00000034284, CTSS, ARRB1, VSIG4, CD68 
+	   ADAM28, SLA-DMB, ENSSSCG00000037137, SHC3, COLEC12, SERPING1, CD74, CCDC88A, OSR1, AIF1 
+"
+"0","```r
+#VizDimLoadings(pbmc,dims=1:5,reduction=\"pca\")
+DimPlot(pbmc,reduction=\"pca\")
+```"

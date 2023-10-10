@@ -1,0 +1,23 @@
+"0","```r
+# Dotplot
+Idents.name <- c(\"PT-S1\",\"PT-S2\",\"PT-S3\",
+                 \"LOH\",\"TAL\",\"DT&CD\",
+                 \"Endo\",\"SMC\",\"MC\",\"Podo\",
+                 \"Fib\",'temp1',\"temp2\")
+names(Idents.name) <- as.character(0:12)
+pbmc <- RenameIdents(pbmc,Idents.name)
+
+Idents(pbmc) <- factor(Idents(pbmc),levels = rev(c(\"PT-S1\",\"PT-S2\",\"PT-S3\",
+                                               \"LOH\",\"TAL\",\"DT&CD\",
+                                               \"Endo\",\"SMC\",\"MC\",\"Podo\",
+                                               \"Fib\",\"temp1\",\"temp2\")))
+markers.to.plot <- c(\"Slc5a2\",\"Slc27a2\",\"Slc5a12\",\"Fxyd2\",\"Hrsp12\",\"Atp11a\",\"Slc13a3\",
+                     \"Aqp1\",\"Bst1\",\"Umod\",\"Slc12a1\",\"Slc5a1\",
+                     \"Slc12a3\",\"Aqp2\",\"Flt1\",\"Kdr\",\"Acta2\",
+                     \"Tagln\",\"Dcn\",
+                     \"Nphs1\",\"Nphs2\",\"S100a4\",\"Cd14\",\"C1qa\")
+markers.to.plot <- toupper(markers.to.plot)
+
+DotPlot(pbmc, features = markers.to.plot, cols = c(\"lightblue\",\"blue\")) +
+  RotatedAxis()
+```"

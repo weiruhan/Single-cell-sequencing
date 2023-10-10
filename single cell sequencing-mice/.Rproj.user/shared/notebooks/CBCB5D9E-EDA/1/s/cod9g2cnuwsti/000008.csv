@@ -1,0 +1,5 @@
+"0","```r
+# Use \"+\" from patchwork to replace CombinePlots function from Seurat
+# plot1 + plot2
+# dev.off()
+```"

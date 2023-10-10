@@ -1,0 +1,11 @@
+"0","```r
+pdf(file=\"QC_plot.pdf\",width=18,height=9)
+VlnPlot(pbmc,features=c(\"nFeature_RNA\",\"nCount_RNA\",\"percent.mt\"),ncol=3)
+plot1 <- FeatureScatter(pbmc, feature1 = \"nCount_RNA\", feature2 = \"percent.mt\")
+plot2 <- FeatureScatter(pbmc, feature1 = \"nCount_RNA\", feature2 = \"nFeature_RNA\")
+plot1
+plot2
+# Use \"+\" from patchwork to replace CombinePlots function from Seurat
+plot1 + plot2
+dev.off()
+```"

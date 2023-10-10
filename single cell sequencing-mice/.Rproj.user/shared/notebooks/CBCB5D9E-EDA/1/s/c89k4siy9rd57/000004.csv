@@ -1,0 +1,6 @@
+"0","```r
+plot2
+```"
+"1","Warning: Transformation introduced infinite values in continuous x-axis
+Warning: Removed 164 rows containing missing values (geom_point).
+"

@@ -1,0 +1,360 @@
+---
+title: "EDA for single cell sequencing - 'SDC1'"
+output: pdf_document
+date: '2022-06-25'
+---
+
+```{r setup, include=FALSE,warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(Seurat)
+library(tidyverse)
+library(reticulate)
+library(patchwork)
+reticulate::py_install(packages = 'umap-learn')
+```
+
+# Preface
+For generated pdf, the appropriate width and height could be either 21in * 7in, or 8.25in * 3in
+
+* Initialize workspace
+
+```{r import data}
+# input data
+pbmc.data <- Read10X(data.dir = "C:/Users/hanwe/Desktop/single cell sequencing-sdc1/data/filtered_feature_bc_matrix/")
+
+# Genes that are expressed in at least 3 single cells are preserved
+# Cells that contain at least 200 genes are preserved
+pbmc <- CreateSeuratObject(counts=pbmc.data, project="M1M3",min.cells=3,min.features=200) 
+pbmc
+
+# calculate the proportion of transcripts mapping to mitochondrial genes
+pbmc[["percent.mt"]] <- PercentageFeatureSet(pbmc,pattern="^mt-")
+```
+
+* QC plot 
+
+```{r QC plot1}
+# pdf(file="QC_plot.pdf",width=18,height=9)
+VlnPlot(pbmc,features=c("nFeature_RNA","nCount_RNA","percent.mt"),ncol=3)
+plot1 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "percent.mt")
+plot2 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot1
+plot2
+# Use "+" from patchwork to replace CombinePlots function from Seurat
+# plot1 + plot2
+# dev.off()
+```
+
+* Extract cells which contains more than 200 genes but less than 3000 genes, and whose mitochondrial genes percentage is less than 50%
+* Normalize data
+* Identifies top variable features
+
+```{r clean data}
+pbmc <- subset(pbmc, subset = nFeature_RNA > 200 & nFeature_RNA < 3000 & percent.mt < 50)
+pbmc <- NormalizeData(pbmc, normalization.method = "LogNormalize", scale.factor = 10000)
+pbmc <- FindVariableFeatures(pbmc, selection.method = "vst", nfeatures = 2000)
+# pbmc <- FindVariableFeatures(pbmc, selection.method = "mean.var.plot")
+# pbmc <- FindVariableFeatures(pbmc, selection.method = "vst",mean.cutoff = c(0.0125, 0.3),dispersion.cutoff = c(0.5, Inf))
+top10 <- head(VariableFeatures(pbmc), 10)
+plot1 <- VariableFeaturePlot(pbmc)
+plot2 <- LabelPoints(plot=plot1,points=top10)
+plot1
+plot2
+```
+
+* Apply PCA to pbmc
+* Run t-SNE dimensionality reduction on selected features
+* Use KNN to do clustering
+
+```{r PCA}
+# pdf(file="pca_heatmap.pdf")
+all.genes <- rownames(pbmc)
+pbmc <- ScaleData(pbmc, features = all.genes)
+pbmc <- RunPCA(pbmc, features = VariableFeatures(object = pbmc))
+#VizDimLoadings(pbmc,dims=1:5,reduction="pca")
+DimPlot(pbmc,reduction="pca")
+DimHeatmap(pbmc, dims = 1:15, cells = 500, balanced = TRUE)
+ElbowPlot(pbmc)
+
+# Use 15 PCs to run TSNE
+pbmc<-RunTSNE(pbmc,dims=1:15)
+# Use KNN to run do clustering
+pbmc <- FindNeighbors(pbmc, dims = 1:15,k.param = 10)
+pbmc <- FindClusters(pbmc, resolution = 0.12,n.iter = 10000)
+```
+
+
+* Rename Cluster labels
+* Set cluster id
+* Specify color palette for assigned clusters
+
+```{r rename label}
+# Rename Cluster labels
+pbmc <- RenameIdents(object = pbmc,"0" = '2',`1`='3',`2`='1',`3`='7',
+                     `4` = '12',`5` = '6',`6` = '5',`7` = '4',`8` = "11",
+                     `9` = '8',`10` = '9',`11`= '10')
+Idents(pbmc) <- factor(Idents(pbmc),levels = c(1:12))
+
+
+
+# Set cluster id
+cluster.id <- c(`1` = "1 PT-S1",`2` = "2 PT-S2",
+                `3` = "3 PT-S3",`4` = "4 LOH",
+                `5` = "5 TAL", `6` = "6 DT&CD",
+                `7` = "7 Endo", `8` = "8 SMC",
+                `9` = "9 MC", `10` = "10 Podo",
+                `11` = "11 Fib", `12` = "12 Im")
+
+# Specify color palette for assigned clusters
+my_cols <- c('7'='#7CAE00','6'='#C77CFF','3'='#DE8C00',
+             '8'='#FF0000','11'='#619CFF','10'='#FF64B0','5'='#00BFC4',
+             '1'='#B79F00','4'='#00B4F0','12'='#00BA38',
+             '9'='#F564E3','2' = '#00C08B')
+my_cols <- my_cols[order(as.integer(names(my_cols)))]
+
+
+```
+
+* TSNE plot
+
+```{r tnse plot}
+# TSNE plot
+DimPlot(pbmc,reduction = 'tsne',label = TRUE)+
+  scale_color_manual(labels = cluster.id, values = my_cols)
+
+```
+
+* Dotplot
+
+```{r dotplot}
+# Dotplot
+Idents.name <- c("PT-S1","PT-S2","PT-S3",
+                 "LOH","TAL","DT&CD",
+                 "Endo","SMC","MC","Podo",
+                 "Fib","Im")
+names(Idents.name) <- as.character(1:12)
+pbmc <- RenameIdents(pbmc,Idents.name)
+
+Idents(pbmc) <- factor(Idents(pbmc),levels = rev(c("PT-S1","PT-S2","PT-S3",
+                                               "LOH","TAL","DT&CD",
+                                               "Endo","SMC","MC","Podo",
+                                               "Fib","Im")))
+markers.to.plot <- c("Slc5a12","Slc5a2","Lrp2","Slc27a2",
+                     "Aqp1","Bst1","Umod","Slc12a1",
+                     "Slc12a3","Aqp2","Flt1","Kdr","Acta2",
+                     "Tagln","Dcn",
+                     "Nphs1","Nphs2","S100a4","Cd14","C1qa")
+DotPlot(pbmc, features = markers.to.plot, cols = c("lightblue","blue"), dot.scale = 4,col.min = 0) +
+  RotatedAxis()
+```
+
+* Vlnplot
+
+```{r Vlnplot1}
+# Vlnplot
+# Reverse Identity class back to the original status
+Idents.name <- as.character(1:12)
+names(Idents.name) <- c("PT-S1","PT-S2","PT-S3",
+                        "LOH","TAL","DT&CD",
+                        "Endo","SMC","MC","Podo",
+                        "Fib","Im")
+pbmc <- RenameIdents(pbmc,Idents.name)
+pbmc[['active.ident']] <- Idents(pbmc)
+# Idents(pbmc) <- factor(Idents(pbmc),levels = c(1:12))
+VlnPlot(pbmc, features = markers.to.plot,stack = T,flip = T,
+                 pt.size = 0, combine = F,
+        fill.by = "ident",cols = my_cols) + 
+  theme(legend.position = "none",
+        axis.text.y = element_blank(),
+        axis.title.y = element_blank(),axis.title.x = element_blank())+
+  ylab(markers.to.plot)+ggtitle("")
+
+```
+
+* Featureplot for 'Ren1' 'Acta2' 'Ren1 Acta2'
+
+```{r featureplot for Ren1 and Acta2}
+# Feature plot for 'Ren1' 'Acta2' 'Ren1_Acta2'
+FeaturePlot(pbmc, features = c('Acta2','Ren1'),blend = TRUE,
+            cols = c('blue','red'))+NoLegend()
+
+FeaturePlot(pbmc, features = c('Sdc1','Ren1'),blend = TRUE,
+            cols = c('#FFCC00','red'))+NoLegend()
+
+FeaturePlot(pbmc, features = c('Ren1','Sdc1'),blend = TRUE,
+            cols = c('blue','#FFFF00'))+NoLegend()
+
+my_cols[8] <- 'blue'
+# pdf('vlnplot2.pdf')
+VlnPlot(pbmc,features = 'Ren1',fill.by = 'feature',cols = my_cols ,pt.size = 0.5)+NoLegend()
+VlnPlot(pbmc,features = 'Acta2',fill.by = 'feature',cols = rep('#FF0000',12),pt.size = 0.5)+NoLegend()
+VlnPlot(pbmc,features= 'Sdc1', fill.by = "feature",pt.size = 0.5)+NoLegend()
+# dev.off()
+```
+
+* correlation plot
+
+```{r correlation plot}
+# Read expression level data
+express_data <- read.csv(file="M1M3_matrix_filtered.csv",row.names=1)
+
+gene1="Acta2"
+gene2="Ren1"
+id_12 <- which(express_data[gene1,]>0 & express_data[gene2,]>0) # Find cells that contain both "Acta2" and "Ren1"
+express_acta_ren <- express_data[,id_12] # Extract cells that contain both "Acta2" and "Ren1" and expression level for genes
+
+express_acta_ren$`average expression` <- apply(express_acta_ren,1,mean)
+
+cor_gen_ren <- cor(t(express_acta_ren[,-ncol(express_acta_ren)]))
+cor_to_ren <- cor_gen_ren[,"Ren1"] # Extract correlation between all genes and "Ren1"
+rm(cor_gen_ren) # clear unused memory
+cor_to_ren[is.na(cor_to_ren)] <- 0 # replace NA with 0 to show zero correlation
+express_acta_ren$`cor_ren` <- cor_to_ren
+rm(cor_to_ren)
+dim(express_acta_ren) # 18925 features with 2 additional columns
+
+# order data by decreasing correlation
+express_acta_ren <- express_acta_ren[order(express_acta_ren$cor_ren,decreasing = TRUE),]
+
+plot(x = express_acta_ren$cor_ren,y = express_acta_ren$`average expression`,
+     xlim = c(-1,1),xlab = 'Correlation with Ren1',ylab = 'Expression level',cex = 0.5)
+  
+for(kk in 1:11)
+{
+  text(express_acta_ren[kk,]$cor_ren+0.02*(-1)^kk,
+       express_acta_ren[kk,]$`average expression`+0.2,
+       labels=rownames(express_acta_ren)[kk],cex=0.5,col="blue")
+}
+# order data by increasing correlation
+express_acta_ren <- express_acta_ren[order(express_acta_ren$cor_ren,decreasing = FALSE),]
+
+plot(x = express_acta_ren$cor_ren,y = express_acta_ren$`average expression`,
+     xlim = c(-1,1),xlab = 'Correlation with Ren1',ylab = 'Expression level',cex = 0.5)
+
+for(kk in 1:10)
+{
+  text(express_acta_ren[kk,]$cor_ren+0.02*(-1)^kk,
+       express_acta_ren[kk,]$`average expression`+0.2,
+       labels=rownames(express_acta_ren)[kk],cex=0.5,col="blue")
+}
+rm(kk)
+rm(express_acta_ren)
+```
+
+* Analyze target cluster; in this case, the target cluster is the cluster 8
+
+```{r target cluster}
+# Select Cluster 8
+id_8 <- which(Idents(pbmc) == 8) # 115 cells in cluster 8
+cell_8 <- names(Idents(pbmc)[id_8])
+cell_8 <- gsub("-",".", cell_8)
+express_data8 <- express_data[,cell_8] # 18925 features/rows with 115 cells/columns
+dim(express_data8)
+
+# Subset data where Acta2 is positive from cluster 8
+express_data8_act <- express_data8[,which(express_data8["Acta2",]>0)]
+
+ren_factor <- rep(0,ncol(express_data8_act)) # binary vector used to do wilcoxon test
+renid <- which(express_data8_act['Ren1',]>0) # Find cells in cluster 8 that have "Ren1" and "Acta2"
+length(renid) # Number of cells in cluster 8 that have 'Ren1' and "Acta2"
+renid0 <- which(express_data8_act['Ren1',]==0) # Find cells in cluster 8 that do not have "Ren1" but have "Acta2"
+length(renid0)
+ren_factor[renid] <- 1
+
+pval <- matrix(NA, nrow(express_data8_act),4) # 18925 features/genes/rows
+colnames(pval) <- c("p-value","with_Ren1","wo_Ren1","num>0")
+for(i in 1:nrow(express_data8_act))
+{
+  y <- as.numeric(express_data8_act[i,])
+  pval[i,1] <- wilcox.test(y~as.factor(ren_factor))$p.value
+  pval[i,2] <- mean(y[renid]) # Average expression of each gene within cells with "Ren1" and "Acta2"
+  pval[i,3] <- mean(y[renid0]) # Average expression of each gene within cells without "Ren1" but have "Acta2"
+  pval[i,4] <- length(which(y>0)) # Number of cells that have expressed the specified gene
+}
+rownames(pval) <- rownames(express_data8_act)
+pval <- as_tibble(pval,rownames = "rownames")
+
+
+# Remove genes which are expressed in less than or equal to 5 cells
+# 7346 genes are expressed in more than 5 cells among 101 cells
+pval <- pval %>% 
+  filter(`num>0`>5)
+
+pval <- pval %>%
+  mutate(qvalue = p.adjust(`p-value`,method = 'fdr'),
+         diff = with_Ren1-wo_Ren1) # Difference of average expression in cells that contain "Ren1" and do not contain "Ren1
+
+# sort result by qvalue in increasing order
+pval <- pval %>% 
+  arrange(qvalue)
+
+# apply negative-log transformation to pval
+pval <- pval %>%
+  mutate(logq = -log10(qvalue))
+```
+
+* volcanoplot
+
+```{r volcanoplot}
+plot(x = pval$diff,y = pval$logq,xlab = "Difference in Normalized Reads",
+     ylab = "log10 (fdr)", xlim = c(-5,5),pch = 1,cex = 0.7)
+abline(h = -log10(0.2),lty = 2)
+abline(v = 0, lty = 2)
+
+for(kk in 1:11)
+{
+  text(pval$diff[kk]+0.25*(-1)^kk,pval$logq[kk]+0.25*(-1)^kk,
+       labels=pval$rownames[kk],cex=0.6,col="blue")
+}
+
+text(4,1.2,labels="fdr=0.2")
+
+```
+
+* Extract cells that contain either "Ren1" or "Acta2"
+
+```{r Ren1 and Acta2 info}
+# 255 cells have either "Ren1" or "Acta2"
+cell.name <- names(Idents(pbmc))[express_data['Ren1',]>0 | 
+                                   express_data['Acta2',]>0]
+# if cell is in cluster 8(target cluster) then marked as 1, if not then marked as 0
+identity = ifelse(cell.name %in% 
+                    names(Idents(pbmc))[Idents(pbmc) == 8],1,0)
+Ren_Act_set <- as_tibble(cbind(cell.name,identity)) %>%
+  # Denote 1 as this cell has Ren1,0 does not
+  mutate(Ren1 = ifelse(cell.name %in% 
+                         names(Idents(pbmc))[express_data['Ren1',]>0],
+                       1,0),
+         # Denote 1 as this cell has 'Acta2', 0 does not
+         Acta2 = ifelse(cell.name %in%
+                          names(Idents(pbmc))[express_data['Acta2',]>0],
+                        1,0),
+         # Denote 1 as this cell has both genes, 0 does not
+         Ren1_Act2 = ifelse(Ren1 & Acta2,1,0))
+```
+
+
+* Extract cells that contain "Sdc1“
+
+```{r sdc1 info}
+sdc.name <- names(Idents(pbmc))[express_data['Sdc1',]>0]
+sdc_ident <- factor(Idents(pbmc)[sdc.name])
+sdc_stat1 <- tibble(SDC_cell = sdc.name,SDC_cell_identity=sdc_ident)
+
+```
+
+
+* Find Nos1 and Slc12a1
+
+```{r Nos1 and Slc12a1 info}
+#find Nos1 and Slc12a1
+##########################
+matrix_filtered=GetAssayData(object = pbmc, assay = "RNA", slot = "data")
+dim(matrix_filtered)
+write.csv(matrix_filtered,file="HC1_matrix_filtered.csv")
+#id1=which(rownames(matrix_filtered)=="Nos1")
+#id2=which(rownames(matrix_filtered)=="Slc12a1")
+
+allcluster=pbmc@meta.data
+write.csv(allcluster,file="HC1_allcluster.csv")
+```

@@ -1,0 +1,51 @@
+"0","```r
+
+# Use 15 PCs to run TSNE
+pbmc <- RunUMAP(pbmc,dims = 1:10)
+```"
+"1","16:04:16 UMAP embedding parameters a = 0.9922 b = 1.112
+16:04:16 Read 11759 rows and found 10 numeric columns
+16:04:16 Using Annoy for neighbor search, n_neighbors = 30
+16:04:16 Building Annoy index with metric = cosine, n_trees = 50
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+16:04:18 Writing NN index file to temp file C:\Users\hanwe\AppData\Local\Temp\RtmpEtsalx\file63d06b6727f6
+16:04:18 Searching Annoy index using 1 thread, search_k = 3000
+16:04:23 Annoy recall = 100%
+16:04:24 Commencing smooth kNN distance calibration using 1 thread
+16:04:25 Initializing from normalized Laplacian + noise
+16:04:26 Commencing optimization for 200 epochs, with 499270 positive edges
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+16:04:43 Optimization finished
+"
+"0","```r
+# Use KNN to run do clustering
+pbmc <- FindNeighbors(pbmc, dims = 1:10,k.param = 30,n.trees = 100)
+```"
+"1","Computing nearest neighbor graph
+Computing SNN
+"
+"0","```r
+pbmc <- FindClusters(pbmc, resolution = 0.38,n.iter = 10000,start = 100)
+```"
+"1","Warning: The following arguments are not used: start
+Warning: The following arguments are not used: start
+"
+"1","Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 11759
+Number of edges: 565513
+
+Running Louvain algorithm...
+"
+"1","0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+"
+"1","Maximum modularity in 10 random starts: 0.9105
+Number of communities: 13
+Elapsed time: 2 seconds
+"

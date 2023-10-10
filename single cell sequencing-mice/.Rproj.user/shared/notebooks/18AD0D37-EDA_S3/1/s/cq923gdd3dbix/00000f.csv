@@ -1,0 +1,40 @@
+"0","knitr::opts_chunk$set(echo = TRUE)"
+"0","library(Seurat)"
+"0","library(tidyverse)"
+"0","library(reticulate)"
+"0","library(patchwork)"
+"0","reticulate::py_install(packages = 'umap-learn')"
+"2","+ ""C:/Users/hanwe/AppData/Local/r-miniconda/condabin/conda.bat"" ""install"" ""--yes"" ""--name"" ""r-reticulate"" ""-c"" ""conda-forge"" ""umap-learn""
+"
+"1","Collecting package metadata (current_repodata.json): ...working... done
+"
+"1","Solving environment: ...working... done
+"
+"1","
+"
+"1","
+"
+"1","==> WARNING: A newer version of conda exists. <==
+"
+"1","  current version: 4.11.0
+"
+"1","  latest version: 23.1.0
+"
+"1","
+"
+"1","Please update conda by running
+"
+"1","
+"
+"1","    $ conda update -n base -c defaults conda
+"
+"1","
+"
+"1","
+"
+"1","
+"
+"1","# All requested packages already installed.
+"
+"1","
+"

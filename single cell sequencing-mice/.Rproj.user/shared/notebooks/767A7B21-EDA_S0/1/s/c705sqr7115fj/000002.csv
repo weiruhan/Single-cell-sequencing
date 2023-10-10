@@ -1,0 +1,5 @@
+"0","```r
+# TSNE plot
+DimPlot(pbmc,reduction = 'umap',label = TRUE)
+
+```"

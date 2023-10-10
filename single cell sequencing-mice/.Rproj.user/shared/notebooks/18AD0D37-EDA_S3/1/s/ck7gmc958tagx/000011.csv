@@ -1,0 +1,3 @@
+"0","plot1 <- FeatureScatter(pbmc, feature1 = ""nCount_RNA"", feature2 = ""percent.mt"")"
+"0","plot2 <- FeatureScatter(pbmc, feature1 = ""nCount_RNA"", feature2 = ""nFeature_RNA"")"
+"0","plot1"

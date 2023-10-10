@@ -1,0 +1,5 @@
+"0","```r
+plot1 <- FeatureScatter(pbmc, feature1 = \"nCount_RNA\", feature2 = \"percent.mt\")
+plot2 <- FeatureScatter(pbmc, feature1 = \"nCount_RNA\", feature2 = \"nFeature_RNA\")
+plot1
+```"

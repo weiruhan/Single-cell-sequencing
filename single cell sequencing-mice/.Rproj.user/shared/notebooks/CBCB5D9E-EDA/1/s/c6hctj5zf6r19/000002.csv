@@ -1,0 +1,22 @@
+"0","```r
+# Vlnplot
+# Reverse Identity class back to the original status
+Idents.name <- as.character(0:12)
+names(Idents.name) <- c(\"PT-S1\",\"PT-S2\",\"PT-S3\",
+                        \"LOH\",\"TAL\",\"DT&CD\",
+                        \"Endo\",\"SMC\",\"MC\",\"Podo\",
+                        \"Fib\",\"temp1\",\"temp2\")
+pbmc <- RenameIdents(pbmc,Idents.name)
+pbmc[['active.ident']] <- Idents(pbmc)
+# Idents(pbmc) <- factor(Idents(pbmc),levels = c(1:12))
+VlnPlot(pbmc, features = markers.to.plot,stack = T,flip = T,
+                 pt.size = 0, combine = F,
+        fill.by = \"ident\") + 
+  theme(legend.position = \"none\",
+        axis.text.y = element_blank(),
+        axis.title.y = element_blank(),axis.title.x = element_blank())+
+  ylab(markers.to.plot)+ggtitle(\"\")
+```"
+"1","Warning in FetchData.Seurat(object = object, vars = features, slot = slot) :
+  The following requested variables were not found: HRSP12, AQP1, NPHS2
+"
